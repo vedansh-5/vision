@@ -167,8 +167,12 @@ router.get('/post/:id', async function(req, res, next) {
           return res.redirect('/feed');
       }
 
+      // Get the logged-in user
+      const user = req.isAuthenticated() ? req.user : null;
+
       res.render('post', { 
           post: post,
+          user: user,  // Pass the logged-in user to the template
           nav: true 
       });
   } catch (err) {
@@ -231,6 +235,44 @@ router.post('/createpost', isLoggedIn, upload.single("postimage"), async functio
     });
     req.flash('error', 'Error creating post: ' + error.message);
     res.redirect('/add');
+  }
+});
+
+// Add this new route for deleting posts
+router.delete('/post/:id', isLoggedIn, async function(req, res) {
+  try {
+      const post = await postModel.findById(req.params.id);
+      
+      if (!post) {
+          return res.status(404).json({ error: 'Post not found' });
+      }
+
+      // Check if user owns the post
+      if (post.user.toString() !== req.user._id.toString()) {
+          return res.status(403).json({ error: 'Unauthorized' });
+      }
+
+      // Remove post from user's posts array
+      await userModel.findByIdAndUpdate(req.user._id, {
+          $pull: { posts: post._id }
+      });
+
+      // Delete the post
+      await postModel.findByIdAndDelete(req.params.id);
+
+      // Delete the image file
+      const fs = require('fs');
+      const path = require('path');
+      const imagePath = path.join(__dirname, '../public/images/uploads/', post.image);
+      
+      if (fs.existsSync(imagePath)) {
+          fs.unlinkSync(imagePath);
+      }
+
+      res.json({ success: true });
+  } catch (err) {
+      console.error('Delete post error:', err);
+      res.status(500).json({ error: 'Error deleting post' });
   }
 });
 
