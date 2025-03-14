@@ -1,0 +1,70 @@
+<% include ./partials/header.ejs %>
+
+<div class="min-h-screen bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div class="flex flex-col lg:flex-row items-center justify-between gap-12">
+            <!-- Left Section -->
+            <div class="flex-1 text-center lg:text-left">
+                <h1 class="text-5xl md:text-6xl font-bold text-[#e60023] mb-4">
+                    Get your next
+                </h1>
+                <h2 class="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+                    creative idea
+                </h2>
+                <h3 class="text-xl md:text-2xl text-gray-600 max-w-2xl mb-8">
+                    What do you want to try next? Think of something you're into—like "easy chicken dinner" or "cat drawing"—and see what you find.
+                </h3>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                    <a href="/register" class="inline-flex justify-center items-center px-8 py-3 rounded-full bg-[#e60023] text-white font-semibold hover:bg-[#ad081b] transition-colors duration-300">
+                        Sign up
+                    </a>
+                    <a href="/login" class="inline-flex justify-center items-center px-8 py-3 rounded-full bg-gray-100 text-gray-800 font-semibold hover:bg-gray-200 transition-colors duration-300">
+                        Log in
+                    </a>
+                </div>
+            </div>
+
+            <!-- Right Section -->
+            <div class="flex-1">
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="space-y-4 animate-float">
+                        <img src="/images/pin1.jpg" alt="Pin 1" class="w-full rounded-2xl shadow-lg hover:scale-105 transition-transform duration-300">
+                        <img src="/images/pin2.jpg" alt="Pin 2" class="w-full rounded-2xl shadow-lg hover:scale-105 transition-transform duration-300">
+                    </div>
+                    <div class="space-y-4 animate-float-delayed-1">
+                        <img src="/images/pin3.jpg" alt="Pin 3" class="w-full rounded-2xl shadow-lg hover:scale-105 transition-transform duration-300">
+                        <img src="/images/pin4.jpg" alt="Pin 4" class="w-full rounded-2xl shadow-lg hover:scale-105 transition-transform duration-300">
+                    </div>
+                    <div class="space-y-4 animate-float-delayed-2">
+                        <img src="/images/pin5.jpg" alt="Pin 5" class="w-full rounded-2xl shadow-lg hover:scale-105 transition-transform duration-300">
+                        <img src="/images/pin6.jpg" alt="Pin 6" class="w-full rounded-2xl shadow-lg hover:scale-105 transition-transform duration-300">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add custom animations to your Tailwind config -->
+<style>
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+
+    .animate-float {
+        animation: float 3s ease-in-out infinite;
+    }
+
+    .animate-float-delayed-1 {
+        animation: float 3s ease-in-out infinite;
+        animation-delay: 0.5s;
+    }
+
+    .animate-float-delayed-2 {
+        animation: float 3s ease-in-out infinite;
+        animation-delay: 1s;
+    }
+</style>
+
+<% include ./partials/footer.ejs %>

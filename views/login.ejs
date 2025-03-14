@@ -1,0 +1,27 @@
+<% include ./partials/header.ejs %>
+
+  <div class="w-full h-screen bg-zinc-300 flex items-center justify-center">
+    <div class="w-[25vw] bg-zinc-100 px-15 py-15 rounded-2xl">
+      <h1 class="text-3xl text-center font-semibold text-zinc-600 leading-none  tracking-tighter capitalize">Welcome to <span class="text-4xl text-black"><span class="text-red-600">Pinterest </span> Vision</span>.</h1>
+      <form action="/login" method="POST">
+        <% if(error.length > 0){ %>
+            <p class="mt-1 p-1 text-red-700 rounded-lg"><%= error %></p>
+          <% } %>
+        <label class="inline-block mt-1 text-zinc-800" for="email">Username</label>
+        <input class=" border-2 border-zinc-400 rounded-xl block w-full mt-1 mb-2 px-3 py-2" type="text" name="username" placeholder="Username">
+        <label class="inline-block mt-1 text-zinc-800" for="password">Password</label>
+        <input class=" border-2 border-zinc-400 rounded-xl block w-full mt-1 mb-2 px-3 py-2" type="password" name="password" placeholder="password">
+        <input class=" border-2 rounded-4xl block w-full mt-2 mb-2 px-3 py-2 bg-red-600 text-white rounded-full" type="submit" value="Login">
+        <p class="text-black text-xl font-semibold text-center mt-2 mx-auto w-full">OR</p>
+        <a href="/auth/google" class="flex items-center justify-center gap-2 border-2 border-zinc-400 rounded-full w-full mt-2 mb-2 px-3 py-2 hover:bg-zinc-100">
+            <img src="https://cdn-icons-png.flaticon.com/512/2991/2991148.png" class="w-5 h-5" alt="Google">
+            <span>Continue with Google</span>
+        </a>
+        <a class="mt-2 inline-block text-[14px] font-semibold text-zinc-600" href="#">Forgot your password?</a>
+        <p class="text-[10px] text-zinc-500 mt-3 w-full mx-auto text-center ">By continuing, you agree to Pinterest's Terms of Service and acknowledge you've read our Privacy Policy. Notice at collection.</p>
+      </form>
+      <a class="inline-block mt-4 text-[12px] font-semibold text-zinc-600 text-center w-full" href="/register">Not on <span class="text-black"><span class="text-red-600">Pinterest</span>Vision</span> yet? Sign up.</a>
+    </div>
+  </div>
+
+<% include ./partials/footer.ejs %>
