@@ -1,17 +1,38 @@
 <% include ./partials/header.ejs %>
 
-    <div class="w-full min-h-screen bg-zinc-800 px-10 py-8 text-white">
-        <div class="cards flex flex-wrap gap-10">
-            <% user.posts.forEach(function(elem){ %>
-                <div class="card w-32">
-                    <div class="w-full h-40 bg-sky-200 rounded-xl overflow-hidden">
-                        <img class="w-full h-full object-cover" src="/images/uploads/<%= elem.image %>" alt="">
-                    </div>
-                    <h5 class="mt-2 text-sm"><%= elem.title %></h5>
-                </div>
-            <% }) %>
-            
+<div class="w-full min-h-screen bg-zinc-800 px-10 py-8 text-white">
+    <% if (user && user.posts) { %>
+        <!-- User Profile Header -->
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold"><%= user.fullname %>'s posts</h2>
+            <p class="text-gray-400">@<%= user.username %></p>
         </div>
-    </div>
+
+        <!-- Posts Grid -->
+        <div class="cards flex flex-wrap gap-10">
+            <% if (user.posts.length > 0) { %>
+                <% user.posts.forEach(function(elem){ %>
+                    <div class="card w-32">
+                        <div class="w-full h-40 bg-zinc-700 rounded-xl overflow-hidden">
+                            <img class="w-full h-full object-cover" 
+                                 src="/images/uploads/<%= elem.image %>" 
+                                 alt="<%= elem.title %>">
+                        </div>
+                        <h5 class="mt-2 text-sm"><%= elem.title %></h5>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <p class="text-gray-400">No posts yet</p>
+            <% } %>
+        </div>
+    <% } else { %>
+        <div class="text-center">
+            <p class="text-xl text-gray-400">User not found</p>
+            <a href="/feed" class="inline-block mt-4 px-6 py-2 bg-red-600 rounded-full hover:bg-red-700 transition-colors">
+                Back to Feed
+            </a>
+        </div>
+    <% } %>
+</div>
 
 <% include ./partials/footer.ejs %>

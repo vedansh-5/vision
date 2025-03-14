@@ -118,26 +118,25 @@ router.get('/feed', isLoggedIn, async function(req, res, next) {
   res.render('feed', { user, posts, nav: true });
 });
 
-router.get('/post/:id', async function(req, res, next){
-  try{
-    const post = await postModel.findById(req.params.id)
-            .populate('user', 'username fullname profileImage')
-            .exec();
-        
-        if (!post) {
-            req.flash('error', 'Post not found');
-            return res.redirect('/feed');
-        }
+router.get('/post/:id', async function(req, res, next) {
+  try {
+      const post = await postModel.findById(req.params.id)
+          .populate('user', 'username fullname profileImage');
+      
+      if (!post) {
+          req.flash('error', 'Post not found');
+          return res.redirect('/feed');
+      }
 
-        res.render('show', { 
-            post: post,
-            nav: true
-        });
-    } catch (err) {
-        console.error('Show post error:', err);
-        req.flash('error', 'Error loading post');
-        res.redirect('/feed');
-    }
+      res.render('post', { 
+          post: post,
+          nav: true 
+      });
+  } catch (err) {
+      console.error('Show post error:', err);
+      req.flash('error', 'Error loading post');
+      res.redirect('/feed');
+  }
 });
 
 router.post('/fileupload', isLoggedIn, upload.single("image"),async function(req, res, next) {
