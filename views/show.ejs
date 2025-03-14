@@ -12,14 +12,14 @@
         <div class="cards flex flex-wrap gap-10">
             <% if (user.posts.length > 0) { %>
                 <% user.posts.forEach(function(elem){ %>
-                    <div class="card w-32">
+                    <a href="/post/<%= elem._id %>" class="card w-32">
                         <div class="w-full h-40 bg-zinc-700 rounded-xl overflow-hidden">
                             <img class="w-full h-full object-cover" 
                                  src="/images/uploads/<%= elem.image %>" 
                                  alt="<%= elem.title %>">
                         </div>
                         <h5 class="mt-2 text-sm"><%= elem.title %></h5>
-                    </div>
+                    </a>
                 <% }); %>
             <% } else { %>
                 <p class="text-gray-400">No posts yet</p>

@@ -5,6 +5,8 @@ const postModel = require('../routes/post');
 const { use } = require('passport');
 const passport = require('passport');
 const upload = require('../routes/multer');
+const commentModel = require('../routes/comments');
+
 
 const localStrategy = require('passport-local');
 passport.use(new localStrategy(userModel.authenticate()));
@@ -118,10 +120,47 @@ router.get('/feed', isLoggedIn, async function(req, res, next) {
   res.render('feed', { user, posts, nav: true });
 });
 
+//route for creating comments
+router.post('/post/:id/comment', isLoggedIn, async function(req, res, next) {
+  try {
+      const post = await postModel.findById(req.params.id);
+      if (!post) {
+          req.flash('error', 'Post not found');
+          return res.redirect('/feed');
+      }
+
+      // Create the comment
+      const comment = await commentModel.create({
+          content: req.body.content,
+          user: req.user._id,
+          post: post._id
+      });
+
+      // Add comment to post
+      post.comments.push(comment._id);
+      await post.save();
+
+      req.flash('success', 'Comment added successfully');
+      res.redirect('/post/' + post._id);
+  } catch (err) {
+      console.error('Comment error:', err);
+      req.flash('error', 'Error adding comment');
+      res.redirect('/post/' + req.params.id);
+  }
+});
+
 router.get('/post/:id', async function(req, res, next) {
   try {
       const post = await postModel.findById(req.params.id)
-          .populate('user', 'username fullname profileImage');
+      .populate('user', 'username fullname profileImage')
+      .populate({
+          path: 'comments',
+          populate: {
+              path: 'user',
+              select: 'username profileImage'
+          },
+          options: { sort: { createdAt: -1 } }
+      });
       
       if (!post) {
           req.flash('error', 'Post not found');
