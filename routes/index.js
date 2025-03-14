@@ -208,15 +208,15 @@ router.post('/createpost', isLoggedIn, upload.single("postimage"), async functio
       req.flash('error', 'Please select an image');
       return res.redirect('/add');
     }
-
+    // Process tags
+    const tags = req.body.tags ? req.body.tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0) : [];
     const post = await postModel.create({
       user: req.user._id,
       title: req.body.title,
       description: req.body.description,
       image: req.file.filename,
-      tags: req.body.tags ? req.body.tags.split(',').map(tag => tag.trim()) : []
+      tags: tags
     });
-
     // Add post to user's posts array
     user.posts.push(post._id);
     await user.save();
@@ -224,8 +224,11 @@ router.post('/createpost', isLoggedIn, upload.single("postimage"), async functio
     req.flash('success', 'Post created successfully!');
     res.redirect('/profile');
   } catch (error) {
-    console.log("Uploaded file:", req.file);
-    console.error('Post creation error:', error.stack);  // Log full error details
+    console.error('Post creation error:', {
+      message: error.message,
+      stack: error.stack,
+      body: req.body
+    });
     req.flash('error', 'Error creating post: ' + error.message);
     res.redirect('/add');
   }

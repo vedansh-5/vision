@@ -4,10 +4,27 @@
     <div class="max-w-6xl mx-auto flex gap-10">
         <!-- Left: Image Section -->
         <div class="w-2/3">
-            <div class="w-full h-[80vh] rounded-3xl overflow-hidden bg-zinc-700">
+            <div class="w-full h-[80vh] rounded-3xl overflow-hidden bg-zinc-700 relative group">
                 <img class="w-full h-full object-contain" 
-                     src="/images/uploads/<%= post.image %>" 
-                     alt="<%= post.title %>">
+                    src="/images/uploads/<%= post.image %>" 
+                    alt="<%= post.title %>"
+                    id="postImage">
+                
+                <!-- Enlarge Button -->
+                <button onclick="window.open('/images/uploads/<%= post.image %>', '_blank')"
+                        class="absolute bottom-4 right-4 p-2 bg-black/50 rounded-full 
+                            hover:bg-black/75 transition-all opacity-0 group-hover:opacity-100">
+                    <svg xmlns="http://www.w3.org/2000/svg" 
+                        class="h-6 w-6 text-white" 
+                        fill="none" 
+                        viewBox="0 0 24 24" 
+                        stroke="currentColor">
+                        <path stroke-linecap="round" 
+                            stroke-linejoin="round" 
+                            stroke-width="2" 
+                            d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5m-5 11H4m0 0v-4m0 4l5-5m11 5h-4m4 0v-4m0 4l-5-5" />
+                    </svg>
+                </button>
             </div>
         </div>
 
@@ -33,15 +50,20 @@
             <p class="text-gray-300 mb-6"><%= post.description %></p>
 
             <!-- Tags -->
-            <% if (post.tags && post.tags.length > 0) { %>
-                <div class="flex flex-wrap gap-2 mb-6">
-                    <% post.tags.forEach(function(tag) { %>
-                        <span class="px-3 py-1 bg-zinc-700 rounded-full text-sm">
-                            #<%= tag %>
-                        </span>
-                    <% }) %>
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold mb-2">Tags</h3>
+                <div class="flex flex-wrap gap-2">
+                    <% if (post.tags && post.tags.length > 0) { %>
+                        <% post.tags.forEach(function(tag) { %>
+                            <span class="px-3 py-1 bg-zinc-700 rounded-full text-sm hover:bg-zinc-600 transition-colors">
+                                #<%= tag %>
+                            </span>
+                        <% }) %>
+                    <% } else { %>
+                        <span class="text-gray-400 text-sm">No tags</span>
+                    <% } %>
                 </div>
-            <% } %>
+            </div>
 
             <!-- Creation Date -->
             <p class="text-sm text-gray-400">
