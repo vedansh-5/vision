@@ -123,7 +123,7 @@ router.get('/feed', isLoggedIn, async function(req, res, next) {
 //route for all posts
 router.get('/all', async function(req, res, next) {
   try{
-    const posts = await postModel.find().populate('user').sort({createdAt: -1});
+    const posts = await postModel.find().populate('user', 'username profileImage').sort({createdAt: -1});
     res.render('all', { user: req.user || null, posts, nav: req.isAuthenticated() });
   } catch(err){
     console.error('Error loading posts:', err);
