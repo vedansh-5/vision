@@ -6,12 +6,12 @@
         <div class="w-2/3">
             <div class="w-full h-[80vh] rounded-3xl overflow-hidden bg-zinc-700 relative group">
                 <img class="w-full h-full object-contain" 
-                    src="/images/uploads/<%= post.image %>" 
+                    src="<%= post.image %>" 
                     alt="<%= post.title %>"
                     id="postImage">
                 
                 <!-- Enlarge Button -->
-                <button onclick="window.open('/images/uploads/<%= post.image %>', '_blank')"
+                <button onclick="enlargeImage()"
                         class="absolute bottom-4 right-4 p-2 bg-black/50 rounded-full 
                             hover:bg-black/75 transition-all opacity-0 group-hover:opacity-100">
                     <svg xmlns="http://www.w3.org/2000/svg" 
@@ -34,7 +34,7 @@
             <div class="flex items-center gap-4 mb-6">
                 <div class="w-12 h-12 rounded-full bg-zinc-700 overflow-hidden">
                     <% if (post.user.profileImage) { %>
-                        <img src="/images/uploads/<%= post.user.profileImage %>" 
+                        <img src="<%= post.user.profileImage %>" 
                              class="w-full h-full object-cover" 
                              alt="">
                     <% } %>
@@ -72,7 +72,7 @@
                                     class="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-zinc-700">
                                 Share
                             </button>
-                            <a href="/images/uploads/<%= post.image %>" 
+                            <a href="<%= post.image %>" 
                                download
                                class="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-zinc-700">
                                 Download
@@ -131,7 +131,7 @@
                             <div class="bg-zinc-700 p-4 rounded-xl">
                                 <div class="flex items-center gap-3 mb-2">
                                     <% if (comment.user.profileImage) { %>
-                                        <img src="/images/uploads/<%= comment.user.profileImage %>" 
+                                        <img src="<%= comment.user.profileImage %>" 
                                             class="w-8 h-8 rounded-full object-cover">
                                     <% } %>
                                     <div>
@@ -173,18 +173,28 @@
         
         try {
             const response = await fetch(`/post/${postId}`, {
-                method: 'DELETE'
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'same-origin'
             });
             
-            if (response.ok) {
+            const data = await response.json();
+
+            if (data.success) {
                 window.location.href = '/profile';
             } else {
-                alert('Error deleting post');
+                alert(data.error || 'Error deleting post');
             }
         } catch (err) {
             console.error('Error:', err);
             alert('Error deleting post');
         }
+    }
+    function enlargeImage() {
+        const imageUrl = document.getElementById('postImage').src;
+        window.open(imageUrl, '_blank');
     }
 
     function sharePost() {

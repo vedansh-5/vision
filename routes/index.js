@@ -4,9 +4,9 @@ const userModel = require('../routes/users');
 const postModel = require('../routes/post');
 const { use } = require('passport');
 const passport = require('passport');
-const upload = require('../routes/multer');
+const upload = require('../config/cloudinary');
 const commentModel = require('../routes/comments');
-
+const cloudinary = require('cloudinary').v2;
 
 const localStrategy = require('passport-local');
 passport.use(new localStrategy(userModel.authenticate()));
@@ -120,35 +120,19 @@ router.get('/feed', isLoggedIn, async function(req, res, next) {
   res.render('feed', { user, posts, nav: true });
 });
 
-//route for creating comments
-router.post('/post/:id/comment', isLoggedIn, async function(req, res, next) {
-  try {
-      const post = await postModel.findById(req.params.id);
-      if (!post) {
-          req.flash('error', 'Post not found');
-          return res.redirect('/feed');
-      }
-
-      // Create the comment
-      const comment = await commentModel.create({
-          content: req.body.content,
-          user: req.user._id,
-          post: post._id
-      });
-
-      // Add comment to post
-      post.comments.push(comment._id);
-      await post.save();
-
-      req.flash('success', 'Comment added successfully');
-      res.redirect('/post/' + post._id);
-  } catch (err) {
-      console.error('Comment error:', err);
-      req.flash('error', 'Error adding comment');
-      res.redirect('/post/' + req.params.id);
+//route for all posts
+router.get('/all', async function(req, res, next) {
+  try{
+    const posts = await postModel.find().populate('user').sort({createdAt: -1});
+    res.render('all', { user: req.user || null, posts, nav: req.isAuthenticated() });
+  } catch(err){
+    console.error('Error loading posts:', err);
+    req.flash('error', 'Error loading posts');
+    res.redirect('/feed');
   }
-});
+})
 
+// route for individual post
 router.get('/post/:id', async function(req, res, next) {
   try {
       const post = await postModel.findById(req.params.id)
@@ -182,9 +166,38 @@ router.get('/post/:id', async function(req, res, next) {
   }
 });
 
+//route for creating comments
+router.post('/post/:id/comment', isLoggedIn, async function(req, res, next) {
+  try {
+      const post = await postModel.findById(req.params.id);
+      if (!post) {
+          req.flash('error', 'Post not found');
+          return res.redirect('/feed');
+      }
+
+      // Create the comment
+      const comment = await commentModel.create({
+          content: req.body.content,
+          user: req.user._id,
+          post: post._id
+      });
+
+      // Add comment to post
+      post.comments.push(comment._id);
+      await post.save();
+
+      req.flash('success', 'Comment added successfully');
+      res.redirect('/post/' + post._id);
+  } catch (err) {
+      console.error('Comment error:', err);
+      req.flash('error', 'Error adding comment');
+      res.redirect('/post/' + req.params.id);
+  }
+});
+
 router.post('/fileupload', isLoggedIn, upload.single("image"),async function(req, res, next) {
   const user = await userModel.findOne({username: req.session.passport.user});
-  user.profileImage = req.file.filename;
+  user.profileImage = req.file.path;
   await user.save();
   res.redirect('/profile');
 });
@@ -218,7 +231,7 @@ router.post('/createpost', isLoggedIn, upload.single("postimage"), async functio
       user: req.user._id,
       title: req.body.title,
       description: req.body.description,
-      image: req.file.filename,
+      image: req.file.path,
       tags: tags
     });
     // Add post to user's posts array
@@ -238,7 +251,7 @@ router.post('/createpost', isLoggedIn, upload.single("postimage"), async functio
   }
 });
 
-// Add this new route for deleting posts
+//route for deleting posts
 router.delete('/post/:id', isLoggedIn, async function(req, res) {
   try {
       const post = await postModel.findById(req.params.id);
@@ -247,29 +260,30 @@ router.delete('/post/:id', isLoggedIn, async function(req, res) {
           return res.status(404).json({ error: 'Post not found' });
       }
 
-      // Check if user owns the post
+      // Verify post ownership
       if (post.user.toString() !== req.user._id.toString()) {
           return res.status(403).json({ error: 'Unauthorized' });
       }
 
-      // Remove post from user's posts array
+      // Delete image from Cloudinary
+      if (post.image) {
+          const publicId = post.image.split('/').pop().split('.')[0];
+          try {
+              await cloudinary.uploader.destroy(publicId);
+          } catch (cloudinaryErr) {
+              console.error('Cloudinary deletion error:', cloudinaryErr);
+          }
+      }
+
+      // Remove post reference from user
       await userModel.findByIdAndUpdate(req.user._id, {
           $pull: { posts: post._id }
       });
 
-      // Delete the post
+      // Delete post
       await postModel.findByIdAndDelete(req.params.id);
 
-      // Delete the image file
-      const fs = require('fs');
-      const path = require('path');
-      const imagePath = path.join(__dirname, '../public/images/uploads/', post.image);
-      
-      if (fs.existsSync(imagePath)) {
-          fs.unlinkSync(imagePath);
-      }
-
-      res.json({ success: true });
+      res.status(200).json({ success: true });
   } catch (err) {
       console.error('Delete post error:', err);
       res.status(500).json({ error: 'Error deleting post' });

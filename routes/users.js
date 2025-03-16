@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const { use } = require('passport');
 const plm = require('passport-local-mongoose');
 
-mongoose.connect('mongodb://127.0.0.1:27017/vision');
+// mongoose.connect('mongodb://127.0.0.1:27017/vision');
 
 const userSchema = mongoose.Schema({
   username: String,

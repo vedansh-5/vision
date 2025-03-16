@@ -5,7 +5,7 @@
             <% posts.forEach(function(elem){ %>
                 <a href="/post/<%= elem._id %>" class="card w-32">
                     <div class="w-full h-40 rounded-xl overflow-hidden">
-                        <img class="w-full h-full object-cover" src="/images/uploads/<%= elem.image %>" alt="">
+                        <img class="w-full h-full object-cover" src="<%= elem.image %>" alt="">
                     </div>
                     <h5 class="mt-2 text-sm"><%= elem.title %></h5>
                     <h6 class="text-xs font-semibold opacity-500">@<%= elem.user.username %></h6>

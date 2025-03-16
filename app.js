@@ -3,10 +3,25 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+require('dotenv').config();
+const mongoose = require('mongoose');
 
 const expressSession = require('express-session');
 const passport = require('passport');
 const flash = require('connect-flash');
+
+// MongoDB connection
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/vision')
+  .then(() => console.log('Connected to MongoDB'))
+  .catch(err => console.error('MongoDB connection error:', err));
+  // Add error handlers
+mongoose.connection.on('error', err => {
+  console.error('MongoDB connection error:', err);
+});
+mongoose.connection.on('disconnected', () => {
+  console.log('MongoDB disconnected');
+});
+
 
 
 var indexRouter = require('./routes/index');
